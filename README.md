@@ -7,8 +7,6 @@ sdk: gradio
 sdk_version: 6.9.0
 app_file: app.py
 pinned: false
-license: mit
-short_description: AI-Powered Skin Concern Classifier using Transfer Learning
 ---
-
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+# DermIQ
+AI-Powered Skin Concern Classifier using Transfer Learning
