@@ -1,0 +1,91 @@
+{
+  "clear": {
+    "status": "No Active Acne",
+    "medicines": [
+      {
+        "name": "Cetaphil Gentle Cleanser",
+        "type": "Cleanser",
+        "usage": "Use twice daily as a preventive skincare routine",
+        "warning": "Consult a dermatologist before starting any new product"
+      }
+    ],
+    "precautions": [
+      "Maintain a consistent cleansing routine",
+      "Always wear SPF 30+ sunscreen daily",
+      "Stay hydrated and eat a balanced diet",
+      "Avoid touching your face frequently"
+    ]
+  },
+  "mild": {
+    "status": "Mild Acne Detected",
+    "medicines": [
+      {
+        "name": "Salicylic Acid Face Wash",
+        "type": "Cleanser",
+        "usage": "Use twice daily on affected areas",
+        "warning": "Consult a dermatologist before use"
+      },
+      {
+        "name": "Benzoyl Peroxide 2.5% Gel",
+        "type": "Gel",
+        "usage": "Apply thin layer to affected area once daily at night",
+        "warning": "Consult a dermatologist before use. May cause dryness."
+      }
+    ],
+    "precautions": [
+      "Avoid oil-based moisturizers and heavy makeup",
+      "Change pillowcases every 2-3 days",
+      "Do not pop or squeeze pimples",
+      "Drink at least 8 glasses of water daily",
+      "Avoid high sugar and dairy foods"
+    ]
+  },
+  "moderate": {
+    "status": "Moderate Acne Detected",
+    "medicines": [
+      {
+        "name": "Clindamycin Phosphate Gel 1%",
+        "type": "Gel",
+        "usage": "Apply to affected area twice daily after cleansing",
+        "warning": "Prescription required. Consult a dermatologist before use."
+      },
+      {
+        "name": "Niacinamide Serum 10%",
+        "type": "Serum",
+        "usage": "Apply 2-3 drops to face after cleansing before moisturizer",
+        "warning": "Consult a dermatologist before use"
+      }
+    ],
+    "precautions": [
+      "Consult a dermatologist if condition persists beyond 4 weeks",
+      "Avoid harsh scrubs and exfoliants",
+      "Use only non-comedogenic skincare products",
+      "Reduce stress through exercise or meditation",
+      "Never sleep with makeup on"
+    ]
+  },
+  "severe": {
+    "status": "Severe Acne Detected",
+    "medicines": [
+      {
+        "name": "Isotretinoin (Accutane)",
+        "type": "Oral",
+        "usage": "Dosage prescribed by dermatologist only",
+        "warning": "Strictly requires dermatologist prescription. Do not self-medicate."
+      },
+      {
+        "name": "Doxycycline 100mg",
+        "type": "Oral",
+        "usage": "As prescribed by dermatologist",
+        "warning": "Antibiotic requires prescription. Consult a dermatologist immediately."
+      }
+    ],
+    "precautions": [
+      "See a certified dermatologist immediately",
+      "Do not attempt to self-treat severe acne",
+      "Avoid all harsh skincare products",
+      "Keep skin clean and moisturized with gentle products",
+      "Document your skin condition with photos for your doctor"
+    ]
+  }
+}

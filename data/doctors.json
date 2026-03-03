@@ -1,0 +1,82 @@
+[
+  {
+    "name": "Dr. Priya Sharma",
+    "clinic": "Clear Skin Clinic",
+    "phone": "9876543210",
+    "city": "Mumbai",
+    "pincode": "400001",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Rahul Mehta",
+    "clinic": "SkinCare Centre",
+    "phone": "9876543211",
+    "city": "Mumbai",
+    "pincode": "400002",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Anita Rao",
+    "clinic": "DermaCare Hospital",
+    "phone": "9876543212",
+    "city": "Bangalore",
+    "pincode": "560001",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Suresh Kumar",
+    "clinic": "Skin and Hair Clinic",
+    "phone": "9876543213",
+    "city": "Bangalore",
+    "pincode": "560002",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Kavya Reddy",
+    "clinic": "Glow Derma Clinic",
+    "phone": "9876543214",
+    "city": "Hyderabad",
+    "pincode": "500001",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Arjun Nair",
+    "clinic": "FaceCare Clinic",
+    "phone": "9876543215",
+    "city": "Chennai",
+    "pincode": "600001",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Meena Iyer",
+    "clinic": "Chennai Skin Centre",
+    "phone": "9876543216",
+    "city": "Chennai",
+    "pincode": "600002",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Vikram Singh",
+    "clinic": "Delhi Derm Clinic",
+    "phone": "9876543217",
+    "city": "Delhi",
+    "pincode": "110001",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Pooja Gupta",
+    "clinic": "Capital Skin Care",
+    "phone": "9876543218",
+    "city": "Delhi",
+    "pincode": "110002",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Anil Joshi",
+    "clinic": "Pune Skin Clinic",
+    "phone": "9876543219",
+    "city": "Pune",
+    "pincode": "411001",
+    "specialty": "Dermatologist"
+  }
+]
