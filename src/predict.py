@@ -43,3 +43,34 @@ def predict(image_path, model=None):
         "confidence": f"{confidence:.2f}%",
         "top3": top3
     }
+
+def preprocess_pil_image(pil_image):
+    """Preprocess a PIL image (from Gradio)."""
+    img = pil_image.convert("RGB")
+    img = img.resize(IMG_SIZE)
+    img_array = np.array(img) / 255.0
+    return np.expand_dims(img_array, axis=0)
+
+def predict_image(pil_image, model=None):
+    """Predict condition from a PIL Image object (used by Gradio)."""
+    if model is None:
+        model = load_model()
+    
+    img = preprocess_pil_image(pil_image)
+    predictions = model.predict(img)
+    
+    confidence = float(np.max(predictions) * 100)
+    predicted_index = int(np.argmax(predictions))
+    predicted_class = CLASS_LABELS[predicted_index]
+    
+    top3 = sorted(
+        [(CLASS_LABELS[i], float(predictions[0][i] * 100)) for i in range(4)],
+        key=lambda x: x[1],
+        reverse=True
+    )[:3]
+    
+    return {
+        "class": predicted_class,
+        "confidence": confidence,
+        "top3": top3
+    }
