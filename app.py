@@ -214,21 +214,16 @@ class PDF(FPDF):
     def header(self):
         self.set_font('Times', 'B', 24)
         self.set_text_color(5, 150, 105)
-        # Explicit width
-        usable_w = self.w - self.l_margin - self.r_margin
-        self.cell(usable_w, 15, 'DermIQ Clinical Report', align='C', new_x='LMARGIN', new_y='NEXT')
+        self.cell(0, 15, 'DermIQ Clinical Report', align='C', new_x='LMARGIN', new_y='NEXT')
         self.ln(5)
 
     def footer(self):
         self.set_y(-25)
         self.set_font('Times', 'I', 8)
         self.set_text_color(153, 27, 27)
-        usable_w = self.w - self.l_margin - self.r_margin
-        self.set_x(self.l_margin)
-        self.multi_cell(usable_w, 5, 'MEDICAL DISCLAIMER: FOR SCREENING ONLY. ALWAYS CONFIRM RESULTS WITH A CERTIFIED PHYSICIAN.', align='C')
+        self.multi_cell(0, 5, 'MEDICAL DISCLAIMER: FOR SCREENING ONLY. ALWAYS CONFIRM RESULTS WITH A CERTIFIED PHYSICIAN.', align='C')
         self.set_text_color(128, 128, 128)
-        self.set_x(self.l_margin)
-        self.cell(usable_w, 10, f'Page {self.page_no()}/{{nb}}', align='C')
+        self.cell(0, 10, f'Page {self.page_no()}/{{nb}}', align='C')
 
 def create_report(data):
     if not data: return None
@@ -238,9 +233,6 @@ def create_report(data):
     
     pdf = PDF()
     pdf.alias_nb_pages()
-    pdf.add_page()
-    
-    usable_w = pdf.w - pdf.l_margin - pdf.r_margin
     
     def clean(text):
         if not text: return ""
@@ -266,32 +258,24 @@ def create_report(data):
     if severity == "SEVERE": pdf.set_fill_color(239, 68, 68)
     elif severity == "MODERATE": pdf.set_fill_color(249, 115, 22)
     elif severity == "MILD": pdf.set_fill_color(245, 158, 11)
-    else: pdf.set_fill_color(*THEME_EMERALD)
-    
-    pdf.set_x(pdf.l_margin)
-    pdf.cell(usable_w, 14, f"{severity} ACNE DETECTED", align="C", fill=True, new_x='LMARGIN', new_y='NEXT')
+    pdf.cell(0, 14, f"{severity} ACNE DETECTED", align="C", fill=True, new_x='LMARGIN', new_y='NEXT')
     pdf.ln(10)
 
     # Diagnostic Metrics Section
     pdf.set_font("Times", "B", 14)
     pdf.set_text_color(*THEME_EMERALD)
-    pdf.set_x(pdf.l_margin)
-    pdf.cell(usable_w, 10, "1. Diagnostic Metrics", new_x='LMARGIN', new_y='NEXT')
+    pdf.cell(0, 10, "1. Diagnostic Metrics", new_x='LMARGIN', new_y='NEXT')
     pdf.set_text_color(15, 23, 42)
     pdf.set_font("Times", "", 12)
-    pdf.set_x(pdf.l_margin)
-    pdf.cell(usable_w, 8, f"Classification Mode: {severity.title()}", new_x='LMARGIN', new_y='NEXT')
-    pdf.set_x(pdf.l_margin)
-    pdf.cell(usable_w, 8, f"AI Confidence Score: {data['confidence']}", new_x='LMARGIN', new_y='NEXT')
-    pdf.set_x(pdf.l_margin)
-    pdf.cell(usable_w, 8, f"Session Log Date: {data['date']}", new_x='LMARGIN', new_y='NEXT')
+    pdf.cell(0, 8, f"Classification Mode: {severity.title()}", new_x='LMARGIN', new_y='NEXT')
+    pdf.cell(0, 8, f"AI Confidence Score: {data['confidence']}", new_x='LMARGIN', new_y='NEXT')
+    pdf.cell(0, 8, f"Session Log Date: {data['date']}", new_x='LMARGIN', new_y='NEXT')
     pdf.ln(8)
 
     # Clinical Protocols (Medications)
     pdf.set_font("Times", "B", 14)
     pdf.set_text_color(*THEME_EMERALD)
-    pdf.set_x(pdf.l_margin)
-    pdf.cell(usable_w, 10, "2. Recommended Clinical Protocols", new_x='LMARGIN', new_y='NEXT')
+    pdf.cell(0, 10, "2. Recommended Clinical Protocols", new_x='LMARGIN', new_y='NEXT')
     pdf.set_font("Times", "", 11)
     pdf.set_text_color(30, 41, 59)
     
@@ -300,8 +284,7 @@ def create_report(data):
         usage = clean(m.get("usage", ""))
         if usage and not usage.endswith('.'): usage += '.'
         content = f"- {name}: {usage}"
-        pdf.set_x(pdf.l_margin)
-        pdf.multi_cell(usable_w, 7, content)
+        pdf.multi_cell(0, 7, content)
     pdf.ln(6)
 
     # Safety Care Protocols (Precautions)
@@ -309,16 +292,14 @@ def create_report(data):
     if precs:
         pdf.set_font("Times", "B", 14)
         pdf.set_text_color(*THEME_EMERALD)
-        pdf.set_x(pdf.l_margin)
-        pdf.cell(usable_w, 10, "3. Safety Care Protocols", new_x='LMARGIN', new_y='NEXT')
+        pdf.cell(0, 10, "3. Safety Care Protocols", new_x='LMARGIN', new_y='NEXT')
         pdf.set_font("Times", "", 11)
         pdf.set_text_color(30, 41, 59)
         
         for p in precs:
             p_clean = clean(p)
             if p_clean and not p_clean.endswith('.'): p_clean += '.'
-            pdf.set_x(pdf.l_margin)
-            pdf.multi_cell(usable_w, 7, f" * {p_clean}")
+            pdf.multi_cell(0, 7, f" * {p_clean}")
     pdf.ln(12)
 
     # Patient Specimen Image (Visual Evidence)
@@ -334,8 +315,7 @@ def create_report(data):
             
             pdf.set_font("Times", "B", 12)
             pdf.set_text_color(*THEME_EMERALD)
-            pdf.set_x(pdf.l_margin)
-            pdf.cell(usable_w, 10, "Clinical Specimen Reference:", align='C', new_x='LMARGIN', new_y='NEXT')
+            pdf.cell(0, 10, "Clinical Specimen Reference:", align='C', new_x='LMARGIN', new_y='NEXT')
             pdf.ln(2)
             
             img_w = 100
