@@ -78,5 +78,125 @@
     "city": "Pune",
     "pincode": "411001",
     "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Rakesh Gowda",
+    "clinic": "Mandya Skin Hospital",
+    "phone": "9876543220",
+    "city": "Mandya",
+    "pincode": "571401",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Lakshmi Prasad",
+    "clinic": "Mandya Derma Care",
+    "phone": "9876543221",
+    "city": "Mandya",
+    "pincode": "571402",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Naveen Kumar",
+    "clinic": "Mysuru Skin Clinic",
+    "phone": "9876543222",
+    "city": "Mysuru",
+    "pincode": "570001",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Shalini Rao",
+    "clinic": "Royal Derma Mysuru",
+    "phone": "9876543223",
+    "city": "Mysuru",
+    "pincode": "570002",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Deepak Verma",
+    "clinic": "North Delhi Skin Centre",
+    "phone": "9876543224",
+    "city": "Delhi",
+    "pincode": "110007",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Neha Bansal",
+    "clinic": "South Delhi Skin Clinic",
+    "phone": "9876543225",
+    "city": "Delhi",
+    "pincode": "110048",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Harish Patel",
+    "clinic": "Ahmedabad Skin Hospital",
+    "phone": "9876543226",
+    "city": "Ahmedabad",
+    "pincode": "380001",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Ritu Shah",
+    "clinic": "Glow Skin Ahmedabad",
+    "phone": "9876543227",
+    "city": "Ahmedabad",
+    "pincode": "380002",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Manish Tiwari",
+    "clinic": "Lucknow Derma Care",
+    "phone": "9876543228",
+    "city": "Lucknow",
+    "pincode": "226001",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Sneha Kulkarni",
+    "clinic": "Nagpur Skin Centre",
+    "phone": "9876543229",
+    "city": "Nagpur",
+    "pincode": "440001",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Rohit Das",
+    "clinic": "Kolkata Skin Hospital",
+    "phone": "9876543230",
+    "city": "Kolkata",
+    "pincode": "700001",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Ayesha Khan",
+    "clinic": "Kolkata Derma Clinic",
+    "phone": "9876543231",
+    "city": "Kolkata",
+    "pincode": "700002",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Vinay Shetty",
+    "clinic": "Mangalore Skin Clinic",
+    "phone": "9876543232",
+    "city": "Mangalore",
+    "pincode": "575001",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Shankar Naik",
+    "clinic": "Hubli Derma Care",
+    "phone": "9876543233",
+    "city": "Hubli",
+    "pincode": "580020",
+    "specialty": "Dermatologist"
+  },
+  {
+    "name": "Dr. Pavan Reddy",
+    "clinic": "Vijayawada Skin Hospital",
+    "phone": "9876543234",
+    "city": "Vijayawada",
+    "pincode": "520001",
+    "specialty": "Dermatologist"
   }
 ]

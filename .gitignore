@@ -47,3 +47,19 @@ copilot-messages.log
 # System files
 .DS_Store
 .project/attachments/files/**
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env/
+
+# Application Specific
+app.log
+reports/
+files/
+temp_predict.jpg
+.vscode/

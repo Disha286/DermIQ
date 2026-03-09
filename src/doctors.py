@@ -1,26 +1,32 @@
 import json
+import os
 
-def find_doctors(query, max_results: int = 3):
-    """Return up to *max_results* doctors matching the city or pincode.
 
-    The returned entries include a Google Maps link for the clinic.
+def find_doctors(query: str, max_results: int = 5):
     """
-    with open("data/doctors.json", "r") as f:
-        doctors = json.load(f)
-
-    query = query.strip().lower()
-    if not query:
+    Search dermatologists by city name or PIN code.
+    Returns up to max_results matching records with a Google Maps link.
+    """
+    data_path = os.path.join(os.path.dirname(__file__), "..", "data", "doctors.json")
+    try:
+        with open(data_path, "r", encoding="utf-8") as f:
+            doctors = json.load(f)
+    except Exception:
         return []
 
-    results = [
-        d for d in doctors
-        if query in d["city"].lower() or query in d["pincode"]
-    ]
+    q = (query or "").strip().lower()
 
-    for d in results:
-        # encode spaces for URLs
-        d["maps_link"] = (
-            f"https://maps.google.com/?q={d['name'].replace(' ', '+')}+{d['city']}"
-        )
+    if q:
+        results = [
+            d for d in doctors
+            if q in str(d.get("city", "")).lower() or q in str(d.get("pincode", "")).lower()
+        ]
+    else:
+        results = doctors
+
+    for d in results[:max_results]:
+        name = d.get("name", "").replace(" ", "+")
+        city = d.get("city", "")
+        d["maps_link"] = f"https://maps.google.com/?q={name}+{city}"
 
     return results[:max_results]
