@@ -400,7 +400,7 @@ def analyze_skin_ui(img, hist):
 
     p_html = '<div style="display:flex;flex-direction:column;">'
     for p in med_data.get("precautions", []):
-        p_html += f'<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid #eaeff5;font-size:15px;color:var(--text2);line-height:1.55;">
+        p_html += f'<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid #eaeff5;font-size:15px;color:var(--text);line-height:1.55;">
     p_html += "</div>"
 
     img_b64 = ""
