@@ -544,15 +544,20 @@ HEADER_HTML = f"""
     </div>
     <button class="theme-btn" onclick="
         document.body.classList.toggle('dark-mode');
-        this.innerHTML = document.body.classList.contains('dark-mode') ? '&#9728;&#65039; Light Mode' : '&#127769; Dark Mode';
+        var dark = document.body.classList.contains('dark-mode');
+        this.innerHTML = dark ? '&#9728;&#65039; Light Mode' : '&#127769; Dark Mode';
+        var ft = document.getElementById('footer-text');
+        var fs = document.getElementById('footer-strong');
+        if(ft){ ft.style.color = dark ? '#e8f0f8' : '#0d1b2a'; }
+        if(fs){ fs.style.color = dark ? '#ffffff' : '#0a2540'; }
     ">🌙 Dark Mode</button>
 </div>"""
 
 FOOTER_HTML = """
 <div class="diq-footer">
     <div class="footer-ico">⚕️</div>
-    <div style="font-size:14px;color:#0d1b2a !important;line-height:1.7;font-family:'DM Sans',sans-serif;">
-        <strong style="color:#0a2540;font-weight:700;">Medical Disclaimer —</strong>
+    <div id="footer-text" style="font-size:14px;color:#0d1b2a;line-height:1.7;font-family:'DM Sans',sans-serif;">
+        <strong id="footer-strong" style="color:#0a2540;font-weight:700;">Medical Disclaimer —</strong>
         DermIQ is an AI-powered screening tool for educational purposes only.
         Results should not replace professional medical diagnosis.
         Always consult a certified dermatologist before starting any treatment.
