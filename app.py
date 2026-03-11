@@ -46,7 +46,6 @@ body.dark-mode {
 
 *, *::before, *::after { box-sizing: border-box; }
 
-/* ── Force Gradio light ── */
 html, body,
 .gradio-container,
 .gradio-container > *,
@@ -82,10 +81,8 @@ div[class*="svelte"] {
     background: var(--surface) !important;
 }
 
-/* Full width */
 .gradio-container { max-width: 100% !important; padding: 0 28px !important; }
 
-/* ── FORCE SIDE BY SIDE ROWS ── */
 .gradio-container .gr-row,
 .gradio-container [class*="row"] {
     display: flex !important;
@@ -95,7 +92,7 @@ div[class*="svelte"] {
     flex-wrap: nowrap !important;
 }
 
-/* ── TABS ── */
+/* TABS */
 .tabs-nav {
     background: var(--surface) !important;
     border: 1px solid var(--border) !important;
@@ -129,10 +126,11 @@ div[class*="svelte"] {
 }
 
 body.dark-mode .tabs-nav button.selected {
-    background: var(--teal) !important; color: #0a2540 !important;
+    background: var(--teal) !important;
+    color: #0a2540 !important;
 }
 
-/* ── IMAGE ── */
+/* IMAGE UPLOAD */
 .gradio-container .gr-image,
 .gradio-container [data-testid="image"] {
     background: var(--sur2) !important;
@@ -140,7 +138,13 @@ body.dark-mode .tabs-nav button.selected {
     border-radius: var(--rsm) !important;
 }
 
-/* ── INPUTS ── */
+/* Hide the image component label/toolbar */
+.gradio-container .gr-image > .label-wrap,
+.gradio-container [data-testid="image"] .label-wrap {
+    display: none !important;
+}
+
+/* INPUTS */
 .gradio-container input[type="text"],
 .gradio-container textarea {
     background: var(--surface) !important;
@@ -151,7 +155,7 @@ body.dark-mode .tabs-nav button.selected {
     padding: 11px 14px !important;
 }
 
-/* ── BUTTONS ── */
+/* BUTTONS */
 .btn-main {
     background: linear-gradient(135deg, #0a2540 0%, #0d3060 100%) !important;
     border: none !important;
@@ -167,7 +171,10 @@ body.dark-mode .tabs-nav button.selected {
     width: 100% !important;
 }
 
-.btn-main:hover { transform: translateY(-1px) !important; box-shadow: 0 6px 20px rgba(10,37,64,0.28) !important; }
+.btn-main:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 20px rgba(10,37,64,0.28) !important;
+}
 
 body.dark-mode .btn-main {
     background: linear-gradient(135deg, #00b4a6 0%, #008f84 100%) !important;
@@ -182,7 +189,7 @@ body.dark-mode .btn-main {
     font-size: 14px !important;
 }
 
-/* ── HEADER ── */
+/* HEADER */
 .diq-header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 20px 0 16px; border-bottom: 1px solid var(--border); margin-bottom: 22px;
@@ -231,7 +238,7 @@ body.dark-mode .btn-main {
 
 .theme-btn:hover { background: var(--sur2) !important; border-color: var(--teal) !important; }
 
-/* ── CARD HEADERS ── */
+/* CARD HEADERS */
 .card-hd {
     display: flex; align-items: center; gap: 12px;
     padding: 15px 22px; border-bottom: 1px solid var(--border);
@@ -250,13 +257,7 @@ body.dark-mode .btn-main {
     color: var(--text) !important; letter-spacing: 0.01em !important;
 }
 
-/* ── AWAIT ── */
-.await-wrap { text-align: center; padding: 60px 20px; background: var(--surface); }
-.await-ico { font-size: 52px; margin-bottom: 18px; opacity: 0.35; }
-.await-title { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-.await-sub { font-size: 15px; color: var(--muted); }
-
-/* ── HISTORY ── */
+/* HISTORY */
 .hist-row {
     display: flex; align-items: center; justify-content: space-between;
     padding: 11px 15px; border-radius: 8px; margin-bottom: 9px;
@@ -264,7 +265,7 @@ body.dark-mode .btn-main {
     font-size: 14px; font-weight: 500; color: var(--text2);
 }
 
-/* ── FOOTER ── */
+/* FOOTER */
 .diq-footer {
     margin-top: 32px; padding: 18px 24px;
     background: var(--surface); border: 1px solid var(--border);
@@ -279,25 +280,11 @@ body.dark-mode .btn-main {
     font-size: 18px; flex-shrink: 0;
 }
 
-/* Light mode footer text — explicitly black */
-.footer-txt { font-size: 14px; color: #0d1b2a; line-height: 1.7; }
-.footer-txt strong { color: #0a2540; font-weight: 700; }
-
-/* Dark mode footer text */
-body.dark-mode .footer-txt { color: var(--text2); }
-body.dark-mode .footer-txt strong { color: var(--text); }
-
-/* ── FILE ── */
+/* FILE */
 .gradio-container .gr-file {
     background: var(--sur2) !important;
     border: 1px solid var(--border) !important;
     border-radius: var(--rsm) !important;
-}
-
-/* ── ALL HTML text dark in light mode ── */
-.gradio-container .gr-html,
-.gradio-container .gr-html * {
-    color: var(--text) !important;
 }
 """
 
@@ -316,8 +303,10 @@ def empty(msg):
 
 def get_doctors_ui(q=""):
     docs = find_doctors(q)
-    if not q.strip(): return empty("🔍 Enter a city or pincode to find specialists")
-    if not docs: return empty("No specialists found for this location.")
+    if not q.strip():
+        return empty("🔍 Enter a city or pincode to find specialists")
+    if not docs:
+        return empty("No specialists found for this location.")
     html = '<div style="display:flex;flex-direction:column;gap:12px;">'
     for d in docs:
         html += f"""
@@ -327,7 +316,7 @@ def get_doctors_ui(q=""):
             <div>
                 <div style="font-weight:700;font-size:16px;color:#0d1b2a;">{d['name']}</div>
                 <div style="font-size:14px;color:#3d5a72;margin-top:3px;">{d['clinic']} &middot; {d['city']}</div>
-                <div style="color:#00966e;font-weight:600;font-size:14px;margin-top:8px;">📞 {d['phone']}</div>
+                <div style="color:#007a56;font-weight:600;font-size:14px;margin-top:8px;">📞 {d['phone']}</div>
             </div>
             <a href="{d['maps_link']}" target="_blank" style="text-decoration:none;">
                 <div style="background:#eaeff5;border:1px solid #d8e2ee;color:#0d1b2a;
@@ -337,7 +326,8 @@ def get_doctors_ui(q=""):
     return html + "</div>"
 
 def hist_to_html(hist):
-    if not hist: return empty("No scans recorded yet.")
+    if not hist:
+        return empty("No scans recorded yet.")
     html = ""
     for h in hist:
         c = SEV.get(h['severity'], SEV["moderate"])["color"]
@@ -345,12 +335,14 @@ def hist_to_html(hist):
     return html
 
 def analyze_skin_ui(img, hist):
-    if not img: return [None]*8 + [hist, hist_to_html(hist)]
+    if not img:
+        return [None]*8 + [hist, hist_to_html(hist)]
     res = predict(img)
     sev = res["condition"]
     s   = SEV.get(sev, SEV["moderate"])
     conf_val = res["confidence"]
-    if isinstance(conf_val, str): conf_val = float(conf_val.replace('%',''))
+    if isinstance(conf_val, str):
+        conf_val = float(conf_val.replace('%',''))
 
     badge = f"""
     <div style="display:flex;align-items:center;justify-content:space-between;
@@ -414,10 +406,13 @@ def analyze_skin_ui(img, hist):
     img_b64 = ""
     try:
         from PIL import Image
-        pil = Image.open(img); pil.thumbnail((500,500))
-        buf = io.BytesIO(); pil.save(buf, format="JPEG")
+        pil = Image.open(img)
+        pil.thumbnail((500,500))
+        buf = io.BytesIO()
+        pil.save(buf, format="JPEG")
         img_b64 = base64.b64encode(buf.getvalue()).decode()
-    except: pass
+    except:
+        pass
 
     data_dict = {
         "severity": sev, "confidence": res["confidence"], "top3": res["top3"],
@@ -431,16 +426,21 @@ def analyze_skin_ui(img, hist):
            gr.update(visible=True), gr.update(visible=False), \
            new_hist, hist_to_html(new_hist)
 
-# ── PDF ────────────────────────────────────────────────────────────
+# PDF
 class PDF(FPDF):
     def header(self):
-        self.set_font('Times','B',20); self.set_text_color(10,37,64)
+        self.set_font('Times','B',20)
+        self.set_text_color(10,37,64)
         self.cell(0,13,'DermIQ Clinical Report',align='C',new_x='LMARGIN',new_y='NEXT')
-        self.set_font('Times','',10); self.set_text_color(60,90,115)
+        self.set_font('Times','',10)
+        self.set_text_color(60,90,115)
         self.cell(0,7,'AI Skin Intelligence Platform — Screening Report',align='C',new_x='LMARGIN',new_y='NEXT')
         self.ln(4)
+
     def footer(self):
-        self.set_y(-22); self.set_font('Times','I',8); self.set_text_color(60,90,115)
+        self.set_y(-22)
+        self.set_font('Times','I',8)
+        self.set_text_color(60,90,115)
         self.multi_cell(0,5,'MEDICAL DISCLAIMER: FOR SCREENING ONLY. ALWAYS CONFIRM WITH A CERTIFIED PHYSICIAN.',align='C')
         self.cell(0,6,f'Page {self.page_no()}/{{nb}}',align='C')
 
@@ -460,31 +460,32 @@ def create_report(data):
         t    = datetime.now().strftime('%Y%m%d%H%M%S')
         path = f"reports/DermIQ_{t}.pdf"
         os.makedirs("reports", exist_ok=True)
-
         sev_rgb  = {"SEVERE":(168,21,21),"MODERATE":(175,68,0),"MILD":(154,74,0),"CLEAR":(0,122,86)}
         severity = data['severity'].upper()
         fill     = sev_rgb.get(severity,(0,180,166))
-
-        pdf = PDF(); pdf.alias_nb_pages(); pdf.add_page()
+        pdf = PDF()
+        pdf.alias_nb_pages()
+        pdf.add_page()
         pdf.set_font("Times","B",16)
         pdf.set_text_color(255,255,255)
         pdf.set_fill_color(*fill)
         pdf.cell(0,13,f"{severity} ACNE DETECTED",align="C",fill=True,new_x='LMARGIN',new_y='NEXT')
         pdf.ln(10)
-
-        NAVY=(10,37,64); TEAL=(0,150,140)
+        NAVY = (10,37,64)
+        TEAL = (0,150,140)
 
         def section(title):
-            pdf.set_font("Times","B",13); pdf.set_text_color(*TEAL)
+            pdf.set_font("Times","B",13)
+            pdf.set_text_color(*TEAL)
             pdf.cell(0,9,title,new_x='LMARGIN',new_y='NEXT')
-            pdf.set_text_color(*NAVY); pdf.set_font("Times","",11)
+            pdf.set_text_color(*NAVY)
+            pdf.set_font("Times","",11)
 
         section("1. Diagnostic Metrics")
         pdf.cell(0,8,f"Classification : {severity.title()}",new_x='LMARGIN',new_y='NEXT')
         pdf.cell(0,8,f"AI Confidence  : {data['confidence']}",new_x='LMARGIN',new_y='NEXT')
         pdf.cell(0,8,f"Date           : {data['date']}",new_x='LMARGIN',new_y='NEXT')
         pdf.ln(7)
-
         section("2. Recommended Medications")
         for m in data.get("meds_list",[]):
             name  = clean_text(m.get("name",""))
@@ -492,7 +493,6 @@ def create_report(data):
             if usage and not usage.endswith('.'): usage += '.'
             pdf.multi_cell(0,7,f"- {name}: {usage}")
         pdf.ln(5)
-
         precs = data.get("precs_list",[])
         if precs:
             section("3. Safety Care Protocols")
@@ -501,29 +501,30 @@ def create_report(data):
                 if pc and not pc.endswith('.'): pc += '.'
                 pdf.multi_cell(0,7,f" * {pc}")
         pdf.ln(8)
-
         if data.get("img_b64"):
             try:
                 raw = base64.b64decode(data["img_b64"])
                 tmp = f"reports/tmp_{t}.jpg"
-                with open(tmp,"wb") as f: f.write(raw)
-                if pdf.get_y() > 170: pdf.add_page()
-                pdf.set_font("Times","B",11); pdf.set_text_color(*TEAL)
+                with open(tmp,"wb") as f:
+                    f.write(raw)
+                if pdf.get_y() > 170:
+                    pdf.add_page()
+                pdf.set_font("Times","B",11)
+                pdf.set_text_color(*TEAL)
                 pdf.cell(0,9,"Clinical Specimen Reference:",align='C',new_x='LMARGIN',new_y='NEXT')
                 pdf.ln(2)
                 pdf.image(tmp, x=(pdf.w-100)/2, w=100)
                 os.remove(tmp)
             except Exception as e:
                 print(f"PDF image error: {e}")
-
         pdf.output(path)
         print(f"PDF saved: {path}")
         return path
     except Exception as e:
-        print(f"PDF creation error: {e}")
+        print(f"PDF error: {e}")
         return None
 
-# ── Static HTML ────────────────────────────────────────────────────
+# Static HTML
 LOGO_SVG = """<svg width="36" height="36" viewBox="0 0 36 36" fill="none">
   <path d="M7 6h10C22.6 6 28 11.9 28 18s-5.4 12-11 12H7V6z"
         fill="none" stroke="white" stroke-width="2.6" stroke-linejoin="round"/>
@@ -533,45 +534,46 @@ LOGO_SVG = """<svg width="36" height="36" viewBox="0 0 36 36" fill="none">
         stroke="#00b4a6" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
 </svg>"""
 
-HEADER_HTML = f"""
-<div class="diq-header">
-    <div class="diq-brand">
-        <div class="diq-logo" style="position:relative;z-index:1;">{LOGO_SVG}</div>
-        <div>
-            <div class="diq-name">Derm<span>IQ</span></div>
-            <div class="diq-sub">AI Skin Intelligence Platform</div>
-        </div>
-    </div>
-     <button class="theme-btn" onclick="
-        document.body.classList.toggle('dark-mode');
-        var dark = document.body.classList.contains('dark-mode');
-        this.innerHTML = dark ? '&#9728;&#65039; Light Mode' : '&#127769; Dark Mode';
-        var ft = document.getElementById('footer-text');
-        var fs = document.getElementById('footer-strong');
-        if(ft) ft.style.color = dark ? '#e8f0f8' : '#0d1b2a';
-        if(fs) fs.style.color = dark ? '#ffffff' : '#0a2540';
-    ">🌙 Dark Mode</button>
-</div>"""
+HEADER_HTML = (
+    '<div class="diq-header">'
+    '<div class="diq-brand">'
+    '<div class="diq-logo" style="position:relative;z-index:1;">' + LOGO_SVG + '</div>'
+    '<div>'
+    '<div class="diq-name">Derm<span>IQ</span></div>'
+    '<div class="diq-sub">AI Skin Intelligence Platform</div>'
+    '</div>'
+    '</div>'
+    '<button class="theme-btn" onclick="'
+    'document.body.classList.toggle(\'dark-mode\');'
+    'var dark=document.body.classList.contains(\'dark-mode\');'
+    'this.innerHTML=dark?\'&#9728;&#65039; Light Mode\':\'&#127769; Dark Mode\';'
+    'var ft=document.getElementById(\'footer-text\');'
+    'if(ft) ft.style.color=dark?\'#e8f0f8\':\'#0d1b2a\';'
+    '">&#127769; Dark Mode</button>'
+    '</div>'
+)
 
-FOOTER_HTML = """
-<div class="diq-footer">
-    <div class="footer-ico">⚕️</div>
-    <div id="footer-text" style="font-size:14px;color:#0d1b2a;line-height:1.7;font-family:'DM Sans',sans-serif;">
-        <strong id="footer-strong" style="color:#0a2540;font-weight:700;">Medical Disclaimer —</strong>
-        DermIQ is an AI-powered screening tool for educational purposes only.
-        Results should not replace professional medical diagnosis.
-        Always consult a certified dermatologist before starting any treatment.
-    </div>
-</div>"""
+FOOTER_HTML = (
+    '<div class="diq-footer">'
+    '<div class="footer-ico">&#9877;&#65039;</div>'
+    '<div id="footer-text" style="font-size:14px;color:#0d1b2a;line-height:1.7;font-family:DM Sans,sans-serif;">'
+    '<strong style="color:#0a2540;font-weight:700;">Medical Disclaimer &#8212;</strong> '
+    'DermIQ is an AI-powered screening tool for educational purposes only. '
+    'Results should not replace professional medical diagnosis. '
+    'Always consult a certified dermatologist before starting any treatment.'
+    '</div>'
+    '</div>'
+)
 
-AWAIT_HTML = """
-<div class="await-wrap">
-    <div class="await-ico">🔬</div>
-    <div class="await-title">Awaiting Analysis</div>
-    <div class="await-sub">Upload an image and click Analyze Image</div>
-</div>"""
+AWAIT_HTML = (
+    '<div style="text-align:center;padding:60px 20px;">'
+    '<div style="font-size:52px;margin-bottom:18px;opacity:0.35;">&#128300;</div>'
+    '<div style="font-size:18px;font-weight:600;color:#0d1b2a;margin-bottom:8px;">Awaiting Analysis</div>'
+    '<div style="font-size:15px;color:#3d5a72;">Upload an image and click Analyze Image</div>'
+    '</div>'
+)
 
-# ── Layout ─────────────────────────────────────────────────────────
+# App
 with gr.Blocks(title="DermIQ | AI Skin Intelligence", css=PRO_CSS) as demo:
 
     current_data = gr.State(None)
@@ -581,14 +583,21 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence", css=PRO_CSS) as demo:
 
     with gr.Tabs(elem_classes="tabs-nav"):
 
-        # Analysis Hub
         with gr.Tab("Analysis Hub"):
             with gr.Row(equal_height=True):
                 with gr.Column(scale=5, min_width=300):
                     with gr.Group(elem_classes="pro-card"):
-                       input_photo = gr.Image(label="", type="filepath", height=430, show_label=False)
-                        analyze_btn = gr.Button("⚡ Analyze Specimen",
-                                                elem_classes="btn-main", size="lg")
+                        input_photo = gr.Image(
+                            label="",
+                            type="filepath",
+                            height=400,
+                            show_label=False
+                        )
+                        analyze_btn = gr.Button(
+                            "⚡ Analyze Image",
+                            elem_classes="btn-main",
+                            size="lg"
+                        )
 
                 with gr.Column(scale=7, min_width=400):
                     with gr.Group(elem_classes="pro-card"):
@@ -599,7 +608,6 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence", css=PRO_CSS) as demo:
                             res_conf  = gr.HTML()
                             res_top3  = gr.HTML()
 
-        # Treatment Guide
         with gr.Tab("Treatment Guide"):
             with gr.Row():
                 with gr.Column(scale=1):
@@ -611,25 +619,29 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence", css=PRO_CSS) as demo:
                         gr.HTML(ch("🛡️","Safety Care Protocols"))
                         prec_outlet = gr.HTML(empty("Awaiting analysis results."))
 
-        # Clinical Consultation
         with gr.Tab("Clinical Consultation"):
             with gr.Group(elem_classes="pro-card"):
                 gr.HTML(ch("🏥","Board-Certified Specialists"))
                 with gr.Row():
-                    doc_query = gr.Textbox(placeholder="Search by city or pincode…",
-                                           show_label=False, scale=5)
-                    doc_btn   = gr.Button("Find Specialists", elem_classes="btn-main", scale=1)
+                    doc_query = gr.Textbox(
+                        placeholder="Search by city or pincode…",
+                        show_label=False,
+                        scale=5
+                    )
+                    doc_btn = gr.Button("Find Specialists", elem_classes="btn-main", scale=1)
                 doc_list = gr.HTML(get_doctors_ui())
 
-        # Patient Records
         with gr.Tab("Patient Records"):
             with gr.Row():
                 with gr.Column(scale=6):
                     with gr.Group(elem_classes="pro-card"):
                         gr.HTML(ch("📄","Analysis Report"))
                         no_data_msg = gr.HTML(empty("Run an analysis first, then generate your PDF report here."))
-                        report_btn  = gr.Button("📑 Generate PDF Report",
-                                                elem_classes="btn-main", visible=False)
+                        report_btn  = gr.Button(
+                            "📑 Generate PDF Report",
+                            elem_classes="btn-main",
+                            visible=False
+                        )
                         report_file = gr.File(label="⬇ Download your report", visible=False)
                 with gr.Column(scale=4):
                     with gr.Group(elem_classes="pro-card"):
@@ -639,7 +651,6 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence", css=PRO_CSS) as demo:
 
     gr.HTML(FOOTER_HTML)
 
-    # Events
     analyze_btn.click(
         fn=analyze_skin_ui,
         inputs=[input_photo, pred_history],
