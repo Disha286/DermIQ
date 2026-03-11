@@ -551,8 +551,8 @@ HEADER_HTML = f"""
 FOOTER_HTML = """
 <div class="diq-footer">
     <div class="footer-ico">⚕️</div>
-    <div class="footer-txt">
-        <strong>Medical Disclaimer —</strong>
+    <div style="font-size:14px;color:#0d1b2a !important;line-height:1.7;font-family:'DM Sans',sans-serif;">
+        <strong style="color:#0a2540;font-weight:700;">Medical Disclaimer —</strong>
         DermIQ is an AI-powered screening tool for educational purposes only.
         Results should not replace professional medical diagnosis.
         Always consult a certified dermatologist before starting any treatment.
