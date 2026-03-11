@@ -568,7 +568,7 @@ AWAIT_HTML = """
 <div class="await-wrap">
     <div class="await-ico">🔬</div>
     <div class="await-title">Awaiting Analysis</div>
-    <div class="await-sub">Upload an image and click Analyze Specimen</div>
+    <div class="await-sub">Upload an image and click Analyze Image</div>
 </div>"""
 
 # ── Layout ─────────────────────────────────────────────────────────
@@ -586,7 +586,7 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence", css=PRO_CSS) as demo:
             with gr.Row(equal_height=True):
                 with gr.Column(scale=5, min_width=300):
                     with gr.Group(elem_classes="pro-card"):
-                        input_photo = gr.Image(label="", type="filepath", height=400)
+                       input_photo = gr.Image(label="", type="filepath", height=430, show_label=False)
                         analyze_btn = gr.Button("⚡ Analyze Specimen",
                                                 elem_classes="btn-main", size="lg")
 
