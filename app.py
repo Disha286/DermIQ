@@ -542,14 +542,14 @@ HEADER_HTML = f"""
             <div class="diq-sub">AI Skin Intelligence Platform</div>
         </div>
     </div>
-    <button class="theme-btn" onclick="
+     <button class="theme-btn" onclick="
         document.body.classList.toggle('dark-mode');
         var dark = document.body.classList.contains('dark-mode');
         this.innerHTML = dark ? '&#9728;&#65039; Light Mode' : '&#127769; Dark Mode';
         var ft = document.getElementById('footer-text');
         var fs = document.getElementById('footer-strong');
-        if(ft){ ft.style.color = dark ? '#e8f0f8' : '#0d1b2a'; }
-        if(fs){ fs.style.color = dark ? '#ffffff' : '#0a2540'; }
+        if(ft) ft.style.color = dark ? '#e8f0f8' : '#0d1b2a';
+        if(fs) fs.style.color = dark ? '#ffffff' : '#0a2540';
     ">🌙 Dark Mode</button>
 </div>"""
 
