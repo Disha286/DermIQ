@@ -1,0 +1,7 @@
+tensorflow==2.15.0
+numpy
+pillow
+gradio
+scikit-learn
+fpdf2
+requests
