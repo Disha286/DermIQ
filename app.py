@@ -10,7 +10,7 @@ from src.medication import get_medication
 from src.doctors import find_doctors
 from fpdf import FPDF
 
-os.makedirs("reports", exist_ok=True)
+os.makedirs("/tmp", exist_ok=True)
 
 PRO_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:wght@600;700&display=swap');
@@ -508,8 +508,8 @@ def create_report(data):
         return None
     try:
         ts   = datetime.now().strftime('%Y%m%d%H%M%S')
-        path = "reports/DermIQ_" + ts + ".pdf"
-        os.makedirs("reports", exist_ok=True)
+        path = "/tmp/DermIQ_" + ts + ".pdf"
+        os.makedirs("/tmp", exist_ok=True)
 
         sev_rgb  = {"SEVERE":(168,21,21),"MODERATE":(175,68,0),"MILD":(154,74,0),"CLEAR":(0,122,86)}
         severity = data['severity'].upper()
@@ -562,7 +562,7 @@ def create_report(data):
         if data.get("img_b64"):
             try:
                 raw = base64.b64decode(data["img_b64"])
-                tmp = "reports/tmp_" + ts + ".jpg"
+                tmp = "/tmp/tmp_" + ts + ".jpg"
                 with open(tmp, "wb") as f:
                     f.write(raw)
                 if pdf.get_y() > 170:
