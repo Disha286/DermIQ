@@ -724,6 +724,7 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence") as demo:
     doc_btn.click(get_doctors_ui, inputs=[doc_query], outputs=[doc_list])
 
     def gen_report(d):
+        print("gen_report called, data:", d is not None)
         path = create_report(d)
         if path:
             return gr.update(value=path, visible=True)
