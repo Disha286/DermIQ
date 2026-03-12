@@ -698,7 +698,7 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence") as demo:
                         gr.HTML(ch("&#128196;", "Analysis Report"))
                         no_data_msg = gr.HTML(empty("Run an analysis first, then generate your PDF report here."))
                         report_btn  = gr.Button(
-                            "&#128209; Generate PDF Report",
+                            "📑 Generate PDF Report",
                             elem_classes="btn-main", visible=False
                         )
                         report_file = gr.File(label="Download your report", visible=False)
