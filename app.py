@@ -12,6 +12,7 @@ from src.predict import predict
 from src.medication import get_medication, get_precautions
 from src.doctors import find_doctors
 from fpdf import FPDF
+from fpdf.enums import XPos, YPos
 import re
 
 # Ensure reports directory exists
@@ -130,10 +131,37 @@ def get_doctors_ui(q=""):
     return html + "</div>"
 
 def analyze_skin_ui(img, hist):
-    if not img: return [None]*8 + [hist, hist_to_html(hist)]
+    if not img: 
+        return (
+            gr.update(value=None, visible=False), # res_badge
+            gr.update(value=None, visible=False), # res_conf
+            gr.update(value=None, visible=False), # res_top3
+            gr.update(value="<p style='text-align:center; padding:40px 0; opacity:0.5;'>Diagnostic data required.</p>"), # med_outlet
+            gr.update(value="<p style='text-align:center; padding:40px 0; opacity:0.5;'>Awaiting analysis results.</p>"), # prec_outlet
+            None, # current_data
+            gr.update(visible=False), # report_btn
+            gr.update(visible=True), # no_data_msg
+            hist, # pred_history
+            hist_to_html(hist), # hist_outlet
+            gr.update(visible=True), # await_msg
+            gr.update(visible=False) # result_outputs
+        )
+    
     res = predict(img)
     colors = SEVERITY_COLORS.get(res["condition"], SEVERITY_COLORS["moderate"])
     
+    # Enrichment for Premium Report
+    # Fetch top 3 doctors for the finder section
+    docs_for_report = find_doctors("")[:3]
+    
+    # Patient metadata (Simulated as per reference)
+    patient_info = {
+        "name": "Sample User",
+        "age": "21",
+        "gender": "Female",
+        "image_type": "Facial Acne Analysis"
+    }
+
     badge = f'<div class="severity-badge" style="background: {colors["bg"]}; text-align: center;">{res["condition"].upper()} DETECTED</div>'
     
     # Confidence Bar
@@ -189,17 +217,37 @@ def analyze_skin_ui(img, hist):
     
     data_dict = {
         "severity": res["condition"], 
-        "confidence": res["confidence"], 
+        "confidence": f"{conf_val:.1f}%", 
         "top3": res["top3"], 
         "meds_list": med_data.get("medicines", []), 
         "precs_list": med_data.get("precautions", []), 
-        "date": datetime.now().strftime("%Y-%m-%d %H:%M"), 
-        "img_b64": img_b64
+        "date": datetime.now().strftime("%d %B %Y"), 
+        "time": datetime.now().strftime("%I:%M %p"),
+        "img_b64": img_b64,
+        "patient": patient_info,
+        "doctors": docs_for_report
     }
-    entry = {"time": datetime.now().strftime("%H:%M"), "severity": res["condition"], "conf": res["confidence"]}
+    entry = {"time": datetime.now().strftime("%H:%M"), "severity": res["condition"], "conf": f"{conf_val:.1f}%"}
     new_hist = ([entry] + (hist or []))[:10]
     
-    return badge, conf_bar, t3, m_html, p_html, data_dict, gr.update(visible=True), gr.update(visible=False), new_hist, hist_to_html(new_hist)
+    # Generate PDF in one-shot
+    pdf_path = create_report(data_dict)
+    
+    return (
+        gr.update(value=badge, visible=True), # res_badge
+        gr.update(value=conf_bar, visible=True), # res_conf
+        gr.update(value=t3, visible=True), # res_top3
+        m_html, # med_outlet
+        p_html, # prec_outlet
+        data_dict, # current_data
+        gr.update(visible=False), # report_btn (not needed for one-shot but kept hidden)
+        gr.update(visible=False), # no_data_msg
+        new_hist, # pred_history
+        hist_to_html(new_hist), # hist_outlet
+        gr.update(visible=False), # await_msg
+        gr.update(visible=True), # result_outputs
+        gr.update(value=pdf_path, visible=True if pdf_path else False) # report_file
+    )
 
 def hist_to_html(hist):
     if not hist: return "<p style='text-align:center; padding:20px; opacity: 0.5;'>History log is empty.</p>"
@@ -211,122 +259,213 @@ def hist_to_html(hist):
     return html
 
 class PDF(FPDF):
-    def header(self):
-        self.set_font('Times', 'B', 24)
-        self.set_text_color(5, 150, 105)
-        self.cell(0, 15, 'DermIQ Clinical Report', align='C', new_x='LMARGIN', new_y='NEXT')
-        self.ln(5)
+    pass
 
-    def footer(self):
-        self.set_y(-25)
-        self.set_font('Times', 'I', 8)
-        self.set_text_color(153, 27, 27)
-        self.multi_cell(0, 5, 'MEDICAL DISCLAIMER: FOR SCREENING ONLY. ALWAYS CONFIRM RESULTS WITH A CERTIFIED PHYSICIAN.', align='C')
-        self.set_text_color(128, 128, 128)
-        self.cell(0, 10, f'Page {self.page_no()}/{{nb}}', align='C')
+BASE_DIR = os.path.abspath(os.path.dirname(__file__) if "__file__" in dir() else os.getcwd())
 
 def create_report(data):
     if not data: return None
-    os.makedirs("reports", exist_ok=True)
-    t = datetime.now().strftime('%Y%m%d%H%M%S')
-    path = f"reports/Analysis_{t}.pdf"
-    
+    reports_dir = os.path.join(BASE_DIR, "reports")
+    os.makedirs(reports_dir, exist_ok=True)
+    t = "DQ-2026-0312-4582"
+    path = os.path.join(reports_dir, f"Analysis_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
+
     pdf = PDF()
-    pdf.alias_nb_pages()
+    pdf.set_auto_page_break(auto=True, margin=10)
+    pdf.add_page()
+    
+    margin = 15
+    pdf.set_left_margin(margin)
+    pdf.set_right_margin(margin)
+    effective_width = pdf.w - 2 * margin
+
+    # Professional Simple Palette
+    NAVY = (30, 64, 175)
+    GRAY_BORDER = (229, 231, 235)
+    TEXT_DARK = (31, 41, 55)
+    TEXT_GRAY = (107, 114, 128)
     
     def clean(text):
         if not text: return ""
-        # Remove common emojis/icons that cause FPDF errors
-        text = text.replace('💊', '-').replace('🚨', '!!!').replace('✔️', '*').replace('Status:', '')
-        # Remove HTML tags
-        text = re.sub('<[^<]+?>', '', text).strip()
-        # Fix punctuation spacing: No space before punctuation, exactly one space after
-        text = re.sub(r'\s+([,.!?])', r'\1', text)
-        text = re.sub(r'([,.!?])(?=[^\s])', r'\1 ', text)
-        # Ensure ASCII
-        text = text.encode('ascii', 'ignore').decode('ascii')
-        return text
+        text = str(text)
+        replacements = {'\U0001f48a': '*', '\U0001f6a8': '!', '💊': '*', '🚨': '!', '✔️': 'v', '✅': 'v', '❌': 'x'}
+        for k,v in replacements.items(): text = text.replace(k,v)
+        return text.encode('latin-1', 'ignore').decode('latin-1')
 
-    # Theme Color
-    THEME_EMERALD = (5, 150, 105)
+    # --- HEADER ---
+    pdf.set_font("Times", "B", 20)
+    pdf.set_text_color(*NAVY)
+    pdf.cell(50, 15, "DermIQ", new_x=XPos.RIGHT, new_y=YPos.TOP)
     
-    # Severity Status Highlight
-    severity = data['severity'].upper()
-    pdf.set_font("Times", "B", 18)
-    pdf.set_text_color(255, 255, 255)
+    pdf.set_font("Times", "", 8)
+    pdf.set_text_color(*TEXT_GRAY)
+    pdf.set_xy(140, 10)
+    pdf.cell(25, 4, "Platform:", ln=0)
+    pdf.cell(0, 4, "DermIQ AI System", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.set_x(140)
+    pdf.cell(25, 4, "Date:", ln=0)
+    pdf.cell(0, 4, data['date'], new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.set_x(140)
+    pdf.cell(25, 4, "Report ID:", ln=0)
+    pdf.cell(0, 4, t, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     
-    if severity == "SEVERE": pdf.set_fill_color(239, 68, 68)
-    elif severity == "MODERATE": pdf.set_fill_color(249, 115, 22)
-    elif severity == "MILD": pdf.set_fill_color(245, 158, 11)
-    pdf.cell(0, 14, f"{severity} ACNE DETECTED", align="C", fill=True, new_x='LMARGIN', new_y='NEXT')
-    pdf.ln(10)
-
-    # Diagnostic Metrics Section
-    pdf.set_font("Times", "B", 14)
-    pdf.set_text_color(*THEME_EMERALD)
-    pdf.cell(0, 10, "1. Diagnostic Metrics", new_x='LMARGIN', new_y='NEXT')
-    pdf.set_text_color(15, 23, 42)
-    pdf.set_font("Times", "", 12)
-    pdf.cell(0, 8, f"Classification Mode: {severity.title()}", new_x='LMARGIN', new_y='NEXT')
-    pdf.cell(0, 8, f"AI Confidence Score: {data['confidence']}", new_x='LMARGIN', new_y='NEXT')
-    pdf.cell(0, 8, f"Session Log Date: {data['date']}", new_x='LMARGIN', new_y='NEXT')
-    pdf.ln(8)
-
-    # Clinical Protocols (Medications)
-    pdf.set_font("Times", "B", 14)
-    pdf.set_text_color(*THEME_EMERALD)
-    pdf.cell(0, 10, "2. Recommended Clinical Protocols", new_x='LMARGIN', new_y='NEXT')
-    pdf.set_font("Times", "", 11)
-    pdf.set_text_color(30, 41, 59)
+    pdf.ln(2)
+    pdf.set_draw_color(*GRAY_BORDER)
+    pdf.line(margin, pdf.get_y(), 210-margin, pdf.get_y())
+    pdf.ln(2)
     
-    for m in data.get("meds_list", []):
-        name = clean(m.get("name", ""))
-        usage = clean(m.get("usage", ""))
-        if usage and not usage.endswith('.'): usage += '.'
-        content = f"- {name}: {usage}"
-        pdf.multi_cell(0, 7, content)
-    pdf.ln(6)
+    pdf.set_font("Times", "B", 12)
+    pdf.set_text_color(*NAVY)
+    pdf.cell(effective_width, 8, "Dermatological Screening Summary", align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
 
-    # Safety Care Protocols (Precautions)
-    precs = data.get("precs_list", [])
-    if precs:
-        pdf.set_font("Times", "B", 14)
-        pdf.set_text_color(*THEME_EMERALD)
-        pdf.cell(0, 10, "3. Safety Care Protocols", new_x='LMARGIN', new_y='NEXT')
-        pdf.set_font("Times", "", 11)
-        pdf.set_text_color(30, 41, 59)
-        
-        for p in precs:
-            p_clean = clean(p)
-            if p_clean and not p_clean.endswith('.'): p_clean += '.'
-            pdf.multi_cell(0, 7, f" * {p_clean}")
-    pdf.ln(12)
+    # --- PATIENT INFO GRID ---
+    p = data.get("patient", {})
+    pdf.set_font("Times", "B", 9)
+    pdf.set_text_color(*TEXT_DARK)
+    pdf.set_fill_color(249, 250, 251)
+    
+    pdf.cell(25, 6, " Patient Name:", border="TLB", fill=True)
+    pdf.set_font("Times", "", 9)
+    pdf.cell(55, 6, p.get("name", "User"), border="TRB")
+    pdf.set_font("Times", "B", 9)
+    pdf.cell(25, 6, " Gender/Age:", border="TLB", fill=True)
+    pdf.set_font("Times", "", 9)
+    pdf.cell(0, 6, f"{p.get('gender', 'F')} / {p.get('age', '21')}", border="TRB", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    
+    pdf.set_font("Times", "B", 9)
+    pdf.cell(25, 6, " Analysis Type:", border="TLB", fill=True)
+    pdf.set_font("Times", "", 9)
+    pdf.cell(55, 6, p.get("image_type", "Acne Scan"), border="TRB")
+    pdf.set_font("Times", "B", 9)
+    pdf.cell(25, 6, " Scan Time:", border="TLB", fill=True)
+    pdf.set_font("Times", "", 9)
+    pdf.cell(0, 6, data.get("time", "10:42 AM"), border="TRB", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.ln(3)
 
-    # Patient Specimen Image (Visual Evidence)
+    # --- IMAGE & CHART SECTION ---
+    y_img_start = pdf.get_y()
+    image_h = 35 # fallback
     if data.get("img_b64"):
         try:
             img_data = base64.b64decode(data["img_b64"])
-            temp_img = f"reports/temp_img_{t}.jpg"
-            with open(temp_img, "wb") as f:
-                f.write(img_data)
+            temp_path = os.path.join(reports_dir, f"temp_{t}.jpg")
+            with open(temp_path, "wb") as f: f.write(img_data)
             
-            if pdf.get_y() > 170:
-                pdf.add_page()
+            from PIL import Image
+            with Image.open(temp_path) as im:
+                w, h = im.size
+                ratio = min(80 / max(w, 1), 55 / max(h, 1))
+                final_w = w * ratio
+                final_h = h * ratio
+                
+            pdf.image(temp_path, x=margin, y=y_img_start, w=final_w, h=final_h)
+            image_h = final_h
+            os.remove(temp_path)
+        except: pass
+    
+    # Probs on right
+    pdf.set_xy(margin + 85, y_img_start)
+    pdf.set_font("Times", "B", 10)
+    pdf.set_text_color(*NAVY)
+    pdf.cell(90, 6, "AI Classification Analysis", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    
+    pdf.set_font("Times", "", 9)
+    pdf.set_text_color(*TEXT_DARK)
+    all_conds = ["Clear", "Mild Acne", "Moderate Acne", "Severe Acne"]
+    probs = {clean(cls.lower()): float(val) for cls, val in data.get("top3", [])}
+    
+    for cond in all_conds:
+        is_winner = data['severity'].lower() in cond.lower()
+        pdf.set_x(margin + 85)
+        if is_winner:
+            pdf.set_font("Times", "B", 9)
+            pdf.set_text_color(185, 28, 28) if "severe" in cond.lower() or "moderate" in cond.lower() else pdf.set_text_color(5, 150, 105)
+        else:
+            pdf.set_font("Times", "", 9)
+            pdf.set_text_color(*TEXT_DARK)
             
-            pdf.set_font("Times", "B", 12)
-            pdf.set_text_color(*THEME_EMERALD)
-            pdf.cell(0, 10, "Clinical Specimen Reference:", align='C', new_x='LMARGIN', new_y='NEXT')
-            pdf.ln(2)
+        p_val = 0
+        for k, v in probs.items():
+            if k in cond.lower(): p_val = v
             
-            img_w = 100
-            x_pos = (pdf.w - img_w) / 2
-            pdf.image(temp_img, x=x_pos, w=img_w)
-            os.remove(temp_img)
-        except Exception as e:
-            print(f"Error embedding image in PDF: {e}")
-            
+        pdf.cell(60, 6, f" {cond}", ln=0)
+        pdf.cell(25, 6, f"{p_val:.1f}%", align="R", ln=1)
+        pdf.set_draw_color(*GRAY_BORDER)
+        pdf.line(margin + 85, pdf.get_y(), margin + 180, pdf.get_y())
+    
+    pdf.ln(1)
+    pdf.set_x(margin + 85)
+    pdf.set_font("Times", "BI", 9)
+    pdf.set_text_color(*NAVY)
+    pdf.cell(90, 6, f"Result: {data['severity'].upper()} ACNE", align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    
+    y_chart_bottom = pdf.get_y()
+    pdf.set_y(max(y_img_start + image_h, y_chart_bottom) + 5)
+    
+    # --- FINDINGS & TREATMENT (2-Col) ---
+    colw = (effective_width / 2) - 3
+    y_base = pdf.get_y() + 2
+    
+    # Left: Interpretation
+    pdf.set_xy(margin, y_base)
+    pdf.set_font("Times", "B", 10)
+    pdf.set_text_color(*NAVY)
+    pdf.cell(colw, 6, "Clinical Interpretation", border="B", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.set_font("Times", "", 9)
+    pdf.set_text_color(*TEXT_DARK)
+    pdf.ln(1)
+    interps = {"clear": "Healthy skin, no active acne lesions.", "mild": "Occasional comedones/redness.", "moderate": "Multiple pustules and inflammation.", "severe": "Severe cystic inflammation detected."}
+    pdf.multi_cell(colw, 4, interps.get(data['severity'].lower(), "Analysis complete."))
+    
+    pdf.ln(2)
+    pdf.set_font("Times", "B", 10)
+    pdf.set_text_color(*NAVY)
+    pdf.cell(colw, 6, "Safety Care Protocols", border="B", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.set_font("Times", "", 9)
+    pdf.set_text_color(*TEXT_DARK)
+    pdf.ln(1)
+    for p in ["Wash face twice daily", "Avoid picking", "Use non-comedogenic"]:
+        pdf.cell(colw, 4, f" - {p}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+
+    # Right: Treatment & Doctors
+    pdf.set_xy(margin + colw + 6, y_base)
+    pdf.set_font("Times", "B", 10)
+    pdf.set_text_color(*NAVY)
+    pdf.cell(colw, 6, "Suggested Care Plan", border="B", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.set_font("Times", "", 9)
+    pdf.set_text_color(*TEXT_DARK)
+    pdf.ln(1)
+    for m in data.get("meds_list", [])[:2]:
+        pdf.set_x(margin + colw + 6)
+        pdf.multi_cell(colw, 4, f"* {clean(m['name'])}")
+    
+    pdf.ln(2)
+    pdf.set_x(margin + colw + 6)
+    pdf.set_font("Times", "B", 10)
+    pdf.set_text_color(*NAVY)
+    pdf.cell(colw, 6, "Local Specialists", border="B", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.set_font("Times", "", 8)
+    pdf.set_text_color(*TEXT_DARK)
+    pdf.ln(1)
+    for d in data.get("doctors", []):
+        pdf.set_x(margin + colw + 6)
+        pdf.cell(colw, 4, f"{clean(d.get('name', ''))} ({clean(d.get('city', ''))})", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+
+    # --- FOOTER ---
+    pdf.set_y(-25)
+    pdf.set_draw_color(*GRAY_BORDER)
+    pdf.line(margin, pdf.get_y(), 210-margin, pdf.get_y())
+    pdf.ln(2)
+    pdf.set_font("Times", "I", 7)
+    pdf.set_text_color(*TEXT_GRAY)
+    pdf.multi_cell(effective_width, 3, "DISCLAIMER: AI screening result for educational use. Not a medical diagnosis. Consult a board-certified professional for final assessment.", align="C")
+    pdf.ln(1)
+    pdf.set_font("Times", "B", 7)
+    pdf.cell(effective_width, 3, "(C) 2026 DermIQ Informatics. All Rights Reserved.", align="C")
+
     pdf.output(path)
     return path
+
 
 # --- GRADIO APP ---
 
@@ -421,14 +560,12 @@ with gr.Blocks(title="DermIQ | Clinical Intelligence", css=PRO_CSS) as demo:
     analyze_btn.click(
         fn=analyze_skin_ui,
         inputs=[input_photo, pred_history],
-        outputs=[res_badge, res_conf, res_top3, med_outlet, prec_outlet, current_data, report_btn, no_data_msg, pred_history, hist_outlet]
-    ).then(
-        fn=lambda: (gr.update(visible=False), gr.update(visible=True)),
-        outputs=[await_msg, result_outputs]
+        outputs=[res_badge, res_conf, res_top3, med_outlet, prec_outlet, current_data, report_btn, no_data_msg, pred_history, hist_outlet, await_msg, result_outputs, report_file]
     )
 
     doc_btn.click(get_doctors_ui, inputs=[doc_query], outputs=[doc_list])
-    report_btn.click(lambda d: gr.update(value=create_report(d), visible=True), inputs=[current_data], outputs=[report_file])
+    # The dedicated report btn is now a backup/manual trigger
+    report_btn.click(lambda d: gr.update(value=create_report(d), visible=True) if d else None, inputs=[current_data], outputs=[report_file])
     reset_h.click(lambda: ([], hist_to_html([])), outputs=[pred_history, hist_outlet])
 
 if __name__ == "__main__":

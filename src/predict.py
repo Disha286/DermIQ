@@ -51,7 +51,7 @@ def simulate_prediction(image_path=None):
     ]
     return {
         "condition": severity,
-        "confidence": f"{confidence:.2f}%",
+        "confidence": confidence,
         "top3": top3
     }
 
@@ -78,7 +78,7 @@ def predict(image_path, model=None):
 
     return {
         "condition": predicted_class,
-        "confidence": f"{confidence:.2f}%",
+        "confidence": confidence,
         "top3": top3
     }
 
