@@ -637,7 +637,8 @@ AWAIT_HTML = (
 
 
 # App layout
-with gr.Blocks(title="DermIQ | AI Skin Intelligence", css=PRO_CSS) as demo:
+with gr.Blocks(title="DermIQ | AI Skin Intelligence") as demo:
+    gr.HTML("<style>" + PRO_CSS + "</style>")
 
     current_data = gr.State(None)
     pred_history = gr.State([])
@@ -733,4 +734,4 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence", css=PRO_CSS) as demo:
     reset_h.click(fn=lambda: ([], hist_to_html([])), outputs=[pred_history, hist_outlet])
 
 if __name__ == "__main__":
-    demo.launch(show_api=False)
+    demo.launch()
