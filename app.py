@@ -481,7 +481,7 @@ def clean_text(t):
     return t.encode('ascii', 'ignore').decode('ascii').strip()
 
 
-def create_report(data):
+
     if not data:
         return None
     try:
@@ -674,12 +674,12 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence") as demo:
                 with gr.Column(scale=6):
                     with gr.Group(elem_classes="pro-card"):
                         gr.HTML(ch("&#128196;", "Analysis Report"))
-                        no_data_msg = gr.HTML(empty("Run an analysis first, then generate your PDF report here."))
-                        report_btn  = gr.Button(
+
+
                             "&#128209; Generate PDF Report",
                             elem_classes="btn-main", visible=False
                         )
-                        report_file = gr.File(label="Download your report", visible=False)
+
                 with gr.Column(scale=4):
                     with gr.Group(elem_classes="pro-card"):
                         gr.HTML(ch("&#128336;", "Scan History"))
@@ -693,7 +693,7 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence") as demo:
         fn=analyze_skin_ui,
         inputs=[input_photo, pred_history],
         outputs=[res_badge, res_conf, res_top3, med_outlet, prec_outlet,
-                 current_data, report_btn, no_data_msg, pred_history, hist_outlet]
+
     ).then(
         fn=lambda: (gr.update(visible=False), gr.update(visible=True)),
         outputs=[await_msg, result_outputs]
@@ -701,13 +701,13 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence") as demo:
 
     doc_btn.click(get_doctors_ui, inputs=[doc_query], outputs=[doc_list])
 
-    def gen_report(d):
-        path = create_report(d)
+
+
         if path:
             return gr.update(value=path, visible=True)
         return gr.update(visible=False)
 
-    report_btn.click(fn=gen_report, inputs=[current_data], outputs=[report_file])
+
 
     reset_h.click(fn=lambda: ([], hist_to_html([])), outputs=[pred_history, hist_outlet])
 
