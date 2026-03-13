@@ -433,7 +433,7 @@ def analyze_skin_ui(img, hist):
     for p in med_data.get("precautions", []):
         p_html += (
             '<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 0;'
-            'border-bottom:1px solid #eaeff5;font-size:15px;color:#e8f0f8;line-height:1.55;">'
+            'border-bottom:1px solid #eaeff5;font-size:15px;color:#1e3a52;line-height:1.55;">'
             '<div style="width:22px;height:22px;border-radius:50%;background:rgba(0,180,166,0.09);'
             'border:1px solid rgba(0,180,166,0.22);display:flex;align-items:center;justify-content:center;'
             'flex-shrink:0;color:#007a70;font-size:12px;font-weight:700;margin-top:1px;">&#10003;</div>'
@@ -551,7 +551,7 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence", css=PRO_CSS) as demo:
                             height=400, show_label=False
                         )
                         analyze_btn = gr.Button(
-                            "&#9889; Analyze Image",
+                            "⚡ Analyze Image",
                             elem_classes="btn-main", size="lg"
                         )
 
