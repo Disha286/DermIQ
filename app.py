@@ -515,7 +515,7 @@ def create_report(data):
         severity = data['severity'].upper()
         fill     = sev_rgb.get(severity, (0, 180, 166))
 
-        pdf = PDF(); pdf.set_margins(15, 15, 15)
+        pdf = PDF(orientation="P", unit="mm", format="A4"); pdf.set_margins(20, 20, 20); pdf.set_auto_page_break(auto=True, margin=25)
         pdf.alias_nb_pages()
         pdf.add_page()
         pdf.set_font("Times", "B", 16)
