@@ -474,112 +474,42 @@ def analyze_skin_ui(img, hist):
 
 
 # PDF
-class PDF(FPDF):
-    def header(self):
-        self.set_font('Times', 'B', 20)
-        self.set_text_color(10, 37, 64)
-        self.cell(0, 13, 'DermIQ Clinical Report', align='C', new_x='LMARGIN', new_y='NEXT')
-        self.set_font('Times', '', 10)
-        self.set_text_color(60, 90, 115)
-        self.cell(0, 7, 'AI Skin Intelligence Platform - Screening Report', align='C', new_x='LMARGIN', new_y='NEXT')
-        self.ln(4)
-
-    def footer(self):
-        self.set_y(-22)
-        self.set_font('Times', 'I', 8)
-        self.set_text_color(60, 90, 115)
-        self.multi_cell(0, 5, 'MEDICAL DISCLAIMER: FOR SCREENING ONLY. CONFIRM WITH A CERTIFIED PHYSICIAN.', align='C')
-        self.cell(0, 6, 'Page ' + str(self.page_no()) + '/{nb}', align='C')
-
-
-def clean_text(t):
-    if not t:
-        return ""
-    for c in ['💊','⚠','✓','✔️','🚨','📞','📍','🔬','🏥','📄','🕐','⚕️','⚕','⚡','📑','&#9888;','&#10003;','&#128222;','&#128205;']:
-        t = t.replace(c, ' ')
-    t = re.sub('<[^<]+?>', '', t).strip()
-    t = re.sub(r'\s+([,.!?])', r'\1', t)
-    t = re.sub(r'([,.!?])(?=[^\s])', r'\1 ', t)
-    return t.encode('ascii', 'ignore').decode('ascii').strip()
-
-
 def create_report(data):
     if not data:
         return None
     try:
         ts   = datetime.now().strftime('%Y%m%d%H%M%S')
         path = "/tmp/DermIQ_" + ts + ".pdf"
-        os.makedirs("/tmp", exist_ok=True)
-
-        sev_rgb  = {"SEVERE":(168,21,21),"MODERATE":(175,68,0),"MILD":(154,74,0),"CLEAR":(0,122,86)}
         severity = data['severity'].upper()
-        fill     = sev_rgb.get(severity, (0, 180, 166))
 
-        pdf = PDF(orientation="P", unit="mm", format="A4"); pdf.set_margins(20, 20, 20); pdf.set_auto_page_break(auto=True, margin=25)
-        pdf.alias_nb_pages()
+        pdf = FPDF(orientation="P", unit="mm", format="A4")
+        pdf.set_margins(20, 20, 20)
+        pdf.set_auto_page_break(auto=True, margin=20)
         pdf.add_page()
-        pdf.set_font("Times", "B", 16)
-        pdf.set_text_color(255, 255, 255)
-        pdf.set_fill_color(*fill)
-        pdf.cell(0, 13, severity + " ACNE DETECTED", align="C", fill=True, new_x='LMARGIN', new_y='NEXT')
-        pdf.ln(10)
-
-        NAVY = (10, 37, 64)
-        TEAL = (0, 150, 140)
-
-        def section(title):
-            pdf.set_font("Times", "B", 13)
-            pdf.set_text_color(*TEAL)
-            pdf.cell(0, 9, title, new_x='LMARGIN', new_y='NEXT')
-            pdf.set_text_color(*NAVY)
-            pdf.set_font("Times", "", 11)
-
-        section("1. Diagnostic Metrics")
-        pdf.cell(0, 8, "Classification : " + severity.title(), new_x='LMARGIN', new_y='NEXT')
-        pdf.cell(0, 8, "AI Confidence  : " + str(data['confidence']), new_x='LMARGIN', new_y='NEXT')
-        pdf.cell(0, 8, "Date           : " + data['date'], new_x='LMARGIN', new_y='NEXT')
-        pdf.ln(7)
-
-        section("2. Recommended Medications")
-        for m in data.get("meds_list", []):
-            name  = clean_text(m.get("name", ""))
-            usage = clean_text(m.get("usage", ""))
-            if usage and not usage.endswith('.'):
-                usage += '.'
-            pdf.multi_cell(0, 7, "- " + name + ": " + usage)
+        pdf.set_font("Helvetica", "B", 18)
+        pdf.cell(0, 12, "DermIQ Clinical Report", align="C", new_x="LMARGIN", new_y="NEXT")
+        pdf.set_font("Helvetica", "", 11)
+        pdf.cell(0, 8, "Severity: " + severity, new_x="LMARGIN", new_y="NEXT")
+        pdf.cell(0, 8, "Confidence: " + str(data['confidence']), new_x="LMARGIN", new_y="NEXT")
+        pdf.cell(0, 8, "Date: " + data['date'], new_x="LMARGIN", new_y="NEXT")
         pdf.ln(5)
-
-        precs = data.get("precs_list", [])
-        if precs:
-            section("3. Safety Care Protocols")
-            for p in precs:
-                pc = clean_text(p)
-                if pc and not pc.endswith('.'):
-                    pc += '.'
-                pdf.multi_cell(0, 7, " * " + pc)
-        pdf.ln(8)
-
-        if data.get("img_b64"):
-            try:
-                raw = base64.b64decode(data["img_b64"])
-                tmp = "/tmp/tmp_" + ts + ".jpg"
-                with open(tmp, "wb") as f:
-                    f.write(raw)
-                if pdf.get_y() > 170:
-                    pdf.add_page()
-                pdf.set_font("Times", "B", 11)
-                pdf.set_text_color(*TEAL)
-                pdf.cell(0, 9, "Clinical Specimen Reference:", align='C', new_x='LMARGIN', new_y='NEXT')
-                pdf.ln(2)
-                pdf.image(tmp, x=(pdf.w - 100) / 2, w=100)
-                os.remove(tmp)
-            except Exception as e:
-                print("PDF image error:", e)
-
+        pdf.set_font("Helvetica", "B", 13)
+        pdf.cell(0, 9, "Medications:", new_x="LMARGIN", new_y="NEXT")
+        pdf.set_font("Helvetica", "", 11)
+        for m in data.get("meds_list", []):
+            name = m.get("name","").encode('ascii','ignore').decode()
+            usage = m.get("usage","").encode('ascii','ignore').decode()
+            pdf.multi_cell(0, 7, "- " + name + ": " + usage)
+        pdf.ln(3)
+        pdf.set_font("Helvetica", "B", 13)
+        pdf.cell(0, 9, "Precautions:", new_x="LMARGIN", new_y="NEXT")
+        pdf.set_font("Helvetica", "", 11)
+        for p in data.get("precs_list", []):
+            pc = p.encode('ascii','ignore').decode()
+            pdf.multi_cell(0, 7, "- " + pc)
         pdf.output(path)
         print("PDF saved:", path)
         return path
-
     except Exception as e:
         print("PDF error:", e)
         return None
