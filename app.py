@@ -10,7 +10,7 @@ from src.medication import get_medication
 from src.doctors import find_doctors
 from fpdf import FPDF
 
-os.makedirs("/tmp", exist_ok=True)
+os.makedirs("reports", exist_ok=True)
 
 PRO_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:wght@600;700&display=swap');
@@ -435,7 +435,7 @@ def analyze_skin_ui(img, hist):
     for p in med_data.get("precautions", []):
         p_html += (
             '<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 0;'
-            'border-bottom:1px solid #eaeff5;font-size:15px;color:#1e3a52;line-height:1.55;">'
+            'border-bottom:1px solid #eaeff5;font-size:15px;color:#e8f0f8;line-height:1.55;">'
             '<div style="width:22px;height:22px;border-radius:50%;background:rgba(0,180,166,0.09);'
             'border:1px solid rgba(0,180,166,0.22);display:flex;align-items:center;justify-content:center;'
             'flex-shrink:0;color:#007a70;font-size:12px;font-weight:700;margin-top:1px;">&#10003;</div>'
@@ -474,42 +474,90 @@ def analyze_skin_ui(img, hist):
 
 
 # PDF
+def clean_text(t):
+    if not t:
+        return ""
+    t = re.sub('<[^<]+?>', '', t).strip()
+    return t.encode('ascii', 'ignore').decode('ascii').strip()
+
+
 def create_report(data):
     if not data:
         return None
     try:
-        ts   = datetime.now().strftime('%Y%m%d%H%M%S')
-        path = "/tmp/DermIQ_" + ts + ".pdf"
+        ts       = datetime.now().strftime('%Y%m%d%H%M%S')
+        path     = "/tmp/DermIQ_" + ts + ".pdf"
         severity = data['severity'].upper()
 
         pdf = FPDF(orientation="P", unit="mm", format="A4")
         pdf.set_margins(20, 20, 20)
         pdf.set_auto_page_break(auto=True, margin=20)
         pdf.add_page()
-        pdf.set_font("Helvetica", "B", 18)
+
+        # Title
+        pdf.set_font("Helvetica", "B", 20)
+        pdf.set_text_color(10, 37, 64)
         pdf.cell(0, 12, "DermIQ Clinical Report", align="C", new_x="LMARGIN", new_y="NEXT")
         pdf.set_font("Helvetica", "", 11)
-        pdf.cell(0, 8, "Severity: " + severity, new_x="LMARGIN", new_y="NEXT")
-        pdf.cell(0, 8, "Confidence: " + str(data['confidence']), new_x="LMARGIN", new_y="NEXT")
-        pdf.cell(0, 8, "Date: " + data['date'], new_x="LMARGIN", new_y="NEXT")
-        pdf.ln(5)
+        pdf.set_text_color(60, 90, 115)
+        pdf.cell(0, 8, "AI Skin Intelligence Platform", align="C", new_x="LMARGIN", new_y="NEXT")
+        pdf.ln(6)
+
+        # Severity banner
+        sev_rgb = {"SEVERE":(168,21,21),"MODERATE":(175,68,0),"MILD":(154,74,0),"CLEAR":(0,122,86)}
+        fill = sev_rgb.get(severity, (0, 180, 166))
+        pdf.set_fill_color(*fill)
+        pdf.set_text_color(255, 255, 255)
+        pdf.set_font("Helvetica", "B", 14)
+        pdf.cell(0, 10, severity + " ACNE DETECTED", align="C", fill=True, new_x="LMARGIN", new_y="NEXT")
+        pdf.ln(8)
+
+        # Metrics
+        pdf.set_text_color(10, 37, 64)
         pdf.set_font("Helvetica", "B", 13)
-        pdf.cell(0, 9, "Medications:", new_x="LMARGIN", new_y="NEXT")
+        pdf.cell(0, 9, "Diagnostic Metrics", new_x="LMARGIN", new_y="NEXT")
         pdf.set_font("Helvetica", "", 11)
+        pdf.cell(0, 7, "Classification : " + severity.title(), new_x="LMARGIN", new_y="NEXT")
+        pdf.cell(0, 7, "Confidence     : " + str(data['confidence']), new_x="LMARGIN", new_y="NEXT")
+        pdf.cell(0, 7, "Date           : " + data['date'], new_x="LMARGIN", new_y="NEXT")
+        pdf.ln(6)
+
+        # Medications
+        pdf.set_font("Helvetica", "B", 13)
+        pdf.set_text_color(0, 150, 140)
+        pdf.cell(0, 9, "Recommended Medications", new_x="LMARGIN", new_y="NEXT")
+        pdf.set_font("Helvetica", "", 11)
+        pdf.set_text_color(10, 37, 64)
         for m in data.get("meds_list", []):
-            name = m.get("name","").encode('ascii','ignore').decode()
-            usage = m.get("usage","").encode('ascii','ignore').decode()
-            pdf.multi_cell(0, 7, "- " + name + ": " + usage)
-        pdf.ln(3)
-        pdf.set_font("Helvetica", "B", 13)
-        pdf.cell(0, 9, "Precautions:", new_x="LMARGIN", new_y="NEXT")
-        pdf.set_font("Helvetica", "", 11)
-        for p in data.get("precs_list", []):
-            pc = p.encode('ascii','ignore').decode()
-            pdf.multi_cell(0, 7, "- " + pc)
+            name  = clean_text(m.get("name", ""))
+            usage = clean_text(m.get("usage", ""))
+            if name:
+                pdf.multi_cell(0, 7, "- " + name + ": " + usage)
+        pdf.ln(4)
+
+        # Precautions
+        precs = data.get("precs_list", [])
+        if precs:
+            pdf.set_font("Helvetica", "B", 13)
+            pdf.set_text_color(0, 150, 140)
+            pdf.cell(0, 9, "Safety Care Protocols", new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("Helvetica", "", 11)
+            pdf.set_text_color(10, 37, 64)
+            for p in precs:
+                pc = clean_text(p)
+                if pc:
+                    pdf.multi_cell(0, 7, "* " + pc)
+        pdf.ln(6)
+
+        # Disclaimer
+        pdf.set_font("Helvetica", "I", 9)
+        pdf.set_text_color(100, 100, 100)
+        pdf.multi_cell(0, 6, "DISCLAIMER: This report is for educational screening only. Always consult a certified dermatologist.")
+
         pdf.output(path)
         print("PDF saved:", path)
         return path
+
     except Exception as e:
         print("PDF error:", e)
         return None
@@ -567,8 +615,7 @@ AWAIT_HTML = (
 
 
 # App layout
-with gr.Blocks(title="DermIQ | AI Skin Intelligence") as demo:
-    gr.HTML("<style>" + PRO_CSS + "</style>")
+with gr.Blocks(title="DermIQ | AI Skin Intelligence", css=PRO_CSS) as demo:
 
     current_data = gr.State(None)
     pred_history = gr.State([])
@@ -586,7 +633,7 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence") as demo:
                             height=400, show_label=False
                         )
                         analyze_btn = gr.Button(
-                            "⚡ Analyze Image",
+                            "&#9889; Analyze Image",
                             elem_classes="btn-main", size="lg"
                         )
 
@@ -628,8 +675,8 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence") as demo:
                         gr.HTML(ch("&#128196;", "Analysis Report"))
                         no_data_msg = gr.HTML(empty("Run an analysis first, then generate your PDF report here."))
                         report_btn  = gr.Button(
-                            "📑 Generate PDF Report",
-                            elem_classes="btn-main", visible=False, interactive=True
+                            "&#128209; Generate PDF Report",
+                            elem_classes="btn-main", visible=False
                         )
                         report_file = gr.File(label="Download your report", visible=False)
                 with gr.Column(scale=4):
@@ -654,7 +701,6 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence") as demo:
     doc_btn.click(get_doctors_ui, inputs=[doc_query], outputs=[doc_list])
 
     def gen_report(d):
-        print("gen_report called, data:", d is not None)
         path = create_report(d)
         if path:
             return gr.update(value=path, visible=True)
@@ -665,4 +711,4 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence") as demo:
     reset_h.click(fn=lambda: ([], hist_to_html([])), outputs=[pred_history, hist_outlet])
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(show_api=False)
