@@ -615,7 +615,8 @@ AWAIT_HTML = (
 
 
 # App layout
-with gr.Blocks(title="DermIQ | AI Skin Intelligence", css=PRO_CSS) as demo:
+with gr.Blocks(title="DermIQ | AI Skin Intelligence") as demo:
+    gr.HTML("<style>" + PRO_CSS + "</style>") 
 
     current_data = gr.State(None)
     pred_history = gr.State([])
