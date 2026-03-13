@@ -712,4 +712,4 @@ with gr.Blocks(title="DermIQ | AI Skin Intelligence") as demo:
     reset_h.click(fn=lambda: ([], hist_to_html([])), outputs=[pred_history, hist_outlet])
 
 if __name__ == "__main__":
-    demo.launch(show_api=False)
+    demo.launch()
