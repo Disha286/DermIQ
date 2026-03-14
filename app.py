@@ -356,6 +356,18 @@ def analyze_skin_ui(img, hist):
     if not img:
         return [None]*8 + [hist, hist_to_html(hist)]
 
+# Basic skin tone detection — reject non-skin images
+    from PIL import Image as PILImage
+    import numpy as np
+    pil_check = PILImage.open(img).convert("RGB").resize((64, 64))
+    arr = np.array(pil_check).reshape(-1, 3).astype(float)
+    r, g, b = arr[:,0], arr[:,1], arr[:,2]
+    skin_mask = (r > 60) & (g > 40) & (b > 20) & (r > g) & (r > b) & ((r - g) > 10) & (np.max(arr, axis=1) - np.min(arr, axis=1) > 15)
+    skin_ratio = skin_mask.sum() / len(skin_mask)
+    if skin_ratio < 0.08:
+        no_skin = "<div style='text-align:center;padding:40px;color:#a81515;font-size:16px;font-weight:600;'>⚠ No skin detected. Please upload a clear image of skin or acne.</div>"
+        return (no_skin, "", "", "", "", None, hist, hist_to_html(hist))
+    
     res      = predict(img)
     sev      = res["condition"]
     s        = SEV.get(sev, SEV["moderate"])
